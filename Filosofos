@@ -21,3 +21,17 @@ public:
     void pensar() {
 
     }
+
+    void comer(){
+    }
+    
+    void ejecutar(){
+    }
+    
+    void ejecutar_filosofos(){
+    {
+    
+    void mostrar_estadisticas(){
+    }
+    
+    
