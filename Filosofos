@@ -1,1 +1,23 @@
+#include <iostream>
+#include <vector>
+#include <random>
+#include <thread>
+#include <mutex>
 
+std::mutex mtx; 
+unsigned fideos = 0;
+class Filosofo {
+
+private:
+
+    int id;
+
+    unsigned  estomago;
+
+public:
+
+    Filosofo(int id) : id(id), estomago(0) {}
+
+    void pensar() {
+
+    }
