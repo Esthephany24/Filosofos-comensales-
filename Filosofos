@@ -15,13 +15,14 @@ std::mutex mtx; // Mutex para proteger acceso al plato de fideos
 // estruct para representar a un filosofo
 struct Filosofo {
     int estomago; // estomago del filosofo
-
+    int id;
     void pensar() {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, MAX_PENSAR);
         int tiempo = dis(gen);
         std::this_thread::sleep_for(std::chrono::milliseconds(tiempo));
+        std::cout << "Filosofo " <<id << " penso durante " << tiempo << " milisegundos." << std::endl;
     }
 
     void comer() {
@@ -70,12 +71,11 @@ void cicloFilosofo(int id, Filosofo& filosofo, Tenedores& tenedores) {
 
         tenedores.tomar(id);
         if (fideos > 0) {
-            filosofo.comer();
-            fideos--;
-
             std::cout << "Filosofo " << id << " esta comiendo." << std::endl;
             std::cout << "Incremento del estomago de filosofo " << id << ": " << filosofo.estomago << std::endl;
-            std::cout << "Cantidad de fideos en el estfmago de filosofo " << id << ": " << filosofo.estomago << std::endl;
+            std::cout << "Cantidad de fideos en el estomago de filosofo " << id << ": " << filosofo.estomago << std::endl;
+            filosofo.comer();
+            fideos--;
         }
         tenedores.dejar(id);
     }
