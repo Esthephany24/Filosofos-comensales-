@@ -34,47 +34,39 @@ struct Filosofo {
     }
 };
 
+// Clase para el contenedor de tenedores
+class Tenedores {
+};
 
-    void ejecutar(){
-        while (fideos > 0) {
-            pensar();
-            comer();
-        }
-    }
+int fideos = MAX_FIDEOS; // plato de fideos
+
+//FUNCION PARA CICLO DE VIDA DEL FILOSOFO
     
-    void iniciar_filosofos(){
+    void cicloFilosofos(){
         filosofoThread = thread(&Filosofo::ejecutar, this);
     {
     
-    void unirse() {
-        filosofoThread.join();
-    }
-
-    unsigned int obtenerEstomago() {
-        return estomago;
-    }
-};
-    //void mostrar_estadisticas(){ }
+   
+int main() {
+     int num_filosofos  ;
+    std::cout << "Ingrese el número de filósofos: ";
+    std::cin >> num_filosofos;
     
-    int main() {
-    const int numFilosofos = 5;
+    std::vector<Filosofo> filosofos(num_filosofos);
+    Tenedores tenedores(num_filosofos);
 
-    vector<Filosofo> filosofos;
-    for (int i = 0; i < numFilosofos; i++) {
-        filosofos.push_back(Filosofo(i));
-    }
-
-    vector<thread> threads;
-    for (int i = 0; i < numFilosofos; i++) {
+    std::vector<std::thread> threads;
+   
+    for (int i = 0; i < num_filosofos; i++) {
         threads.push_back(thread(&Filosofo::iniciar, &filosofos[i]));
     }
 
-    for (int i = 0; i < numFilosofos; i++) {
+    for (int i = 0; i < num_filosofos; i++) {
         threads[i].join();
     }
 
     cout << "Estado del plato de fideos: " << fideos << endl;
-    for (int i = 0; i < numFilosofos; i++) {
+    for (int i = 0; i < num_filosofos; i++) {
         cout << "Filosofo " << i << ": Estomago: " << filosofos[i].obtenerEstomago() << endl;
     }
 
