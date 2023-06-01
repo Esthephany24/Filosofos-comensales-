@@ -33,15 +33,39 @@ public:
     }
 
     void comer(){
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution<int> distribution(1, 3);
+
+        int tiempoComiendo = distribution(gen);
+        this_thread::sleep_for(seconds(tiempoComiendo));
+
+        mtx.lock();
+        if (fideos > 0) {
+            fideos--;
+            estomago++;
+            cout << "Filosofo " << id << " comiendo... Estomago: " << estomago << endl;
     }
     
     void ejecutar(){
+        while (fideos > 0) {
+            pensar();
+            comer();
+        }
     }
     
-    void ejecutar_filosofos(){
+    void iniciar_filosofos(){
+        filosofoThread = thread(&Filosofo::ejecutar, this);
     {
     
-    void mostrar_estadisticas(){
+    void unirse() {
+        filosofoThread.join();
     }
+
+    unsigned int obtenerEstomago() {
+        return estomago;
+    }
+};
+    //void mostrar_estadisticas(){ }
     
     
