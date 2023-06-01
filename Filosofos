@@ -68,4 +68,28 @@ public:
 };
     //void mostrar_estadisticas(){ }
     
-    
+    int main() {
+    const int numFilosofos = 5;
+
+    vector<Filosofo> filosofos;
+    for (int i = 0; i < numFilosofos; i++) {
+        filosofos.push_back(Filosofo(i));
+    }
+
+    vector<thread> threads;
+    for (int i = 0; i < numFilosofos; i++) {
+        threads.push_back(thread(&Filosofo::iniciar, &filosofos[i]));
+    }
+
+    for (int i = 0; i < numFilosofos; i++) {
+        threads[i].join();
+    }
+
+    cout << "Estado del plato de fideos: " << fideos << endl;
+    for (int i = 0; i < numFilosofos; i++) {
+        cout << "Filosofo " << i << ": Estomago: " << filosofos[i].obtenerEstomago() << endl;
+    }
+
+    return 0;
+}
+
