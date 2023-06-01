@@ -8,7 +8,7 @@
 
 const int MAX_PENSAR = 500; // Tiempo mximo para pensar (milisegundos)
 const int MAX_COMER = 500; // Tiempo mximo para comer (milisegundos)
-const int MAX_FIDEOS = 10; // Cantidad inicial de fideos en el plato
+const int MAX_FIDEOS = 15; // Cantidad inicial de fideos en el plato
 
 std::mutex mtx; // Mutex para proteger acceso al plato de fideos
 
@@ -68,18 +68,21 @@ int fideos = MAX_FIDEOS; // plato de fideos
 void cicloFilosofo(int id, Filosofo& filosofo, Tenedores& tenedores) {
     while (fideos > 0) {
         filosofo.pensar();
+        //std::cout << "Filosofo " << id << " esta pensando. Tiempo de pensamiento: " << MAX_PENSAR << " ms" << std::endl;
 
         tenedores.tomar(id);
         if (fideos > 0) {
+            filosofo.comer();
+            fideos--;
+            
             std::cout << "Filosofo " << id << " esta comiendo." << std::endl;
             std::cout << "Incremento del estomago de filosofo " << id << ": " << filosofo.estomago << std::endl;
             std::cout << "Cantidad de fideos en el estomago de filosofo " << id << ": " << filosofo.estomago << std::endl;
-            filosofo.comer();
-            fideos--;
         }
         tenedores.dejar(id);
     }
 }
+   
    
 int main() {
     int num_filosofos;
