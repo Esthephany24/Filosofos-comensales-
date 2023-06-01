@@ -73,7 +73,9 @@ void cicloFilosofo(int id, Filosofo& filosofo, Tenedores& tenedores) {
             filosofo.comer();
             fideos--;
 
-            std::cout << "Filósofo " << id << " está comiendo." << std::endl;
+            std::cout << "Filosofo " << id << " esta comiendo." << std::endl;
+            std::cout << "Incremento del estomago de filosofo " << id << ": " << filosofo.estomago << std::endl;
+            std::cout << "Cantidad de fideos en el estfmago de filosofo " << id << ": " << filosofo.estomago << std::endl;
         }
         tenedores.dejar(id);
     }
@@ -81,7 +83,7 @@ void cicloFilosofo(int id, Filosofo& filosofo, Tenedores& tenedores) {
    
 int main() {
     int num_filosofos;
-    std::cout << "Ingrese el número de filósofos: ";
+    std::cout << "Ingrese el numero de filosofos: ";
     std::cin >> num_filosofos;
 
     std::vector<Filosofo> filosofos(num_filosofos);
@@ -89,7 +91,7 @@ int main() {
 
     std::vector<std::thread> threads;
 
-    // Crear los hilos para cada filósofo
+    // Crear los hilos para cada filosofo
     for (int i = 0; i < num_filosofos; i++) {
         threads.emplace_back(cicloFilosofo, i, std::ref(filosofos[i]), std::ref(tenedores));
     }
@@ -99,11 +101,11 @@ int main() {
         thread.join();
     }
 
-    // Imprimir estado final
+    // imprimir estado final
     std::cout << "Estado final del plato de fideos: " << fideos << std::endl;
-    std::cout << "Estómagos de los filósofos:" << std::endl;
+    std::cout << "Estomagos de los filosofos:" << std::endl;
     for (int i = 0; i < num_filosofos; i++) {
-        std::cout << "Filósofo " << i << ": " << filosofos[i].estomago << std::endl;
+        std::cout << "Filosofo " << i << ": " << filosofos[i].estomago << std::endl;
     }
 
     return 0;
