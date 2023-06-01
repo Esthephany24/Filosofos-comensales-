@@ -36,40 +36,75 @@ struct Filosofo {
 
 // Clase para el contenedor de tenedores
 class Tenedores {
+public:
+    Tenedores(int num) : num_tenedores(num), tenedores(num) {}
+
+    void tomar(int i) {
+        std::unique_lock<std::mutex> lock(mtx);
+        while (tenedores[i] || tenedores[(i + 1) % num_tenedores]) {
+            cv.wait(lock);
+        }
+        tenedores[i] = true;
+        tenedores[(i + 1) % num_tenedores] = true;
+    }
+
+    void dejar(int i) {
+        std::unique_lock<std::mutex> lock(mtx);
+        tenedores[i] = false;
+        tenedores[(i + 1) % num_tenedores] = false;
+        cv.notify_all();
+    }
+
+private:
+    int num_tenedores;
+    std::vector<bool> tenedores;
+    std::condition_variable cv;
 };
 
 int fideos = MAX_FIDEOS; // plato de fideos
 
-//FUNCION PARA CICLO DE VIDA DEL FILOSOFO
-    
-    void cicloFilosofos(){
-        filosofoThread = thread(&Filosofo::ejecutar, this);
-    {
-    
+//FUNCION PARA CICLO DE VIDA DEL FILOSOFO 
+void cicloFilosofo(int id, Filosofo& filosofo, Tenedores& tenedores) {
+    while (fideos > 0) {
+        filosofo.pensar();
+
+        tenedores.tomar(id);
+        if (fideos > 0) {
+            filosofo.comer();
+            fideos--;
+
+            std::cout << "Filósofo " << id << " está comiendo." << std::endl;
+        }
+        tenedores.dejar(id);
+    }
+}
    
 int main() {
-     int num_filosofos  ;
+    int num_filosofos;
     std::cout << "Ingrese el número de filósofos: ";
     std::cin >> num_filosofos;
-    
+
     std::vector<Filosofo> filosofos(num_filosofos);
     Tenedores tenedores(num_filosofos);
 
     std::vector<std::thread> threads;
-   
+
+    // Crear los hilos para cada filósofo
     for (int i = 0; i < num_filosofos; i++) {
-        threads.push_back(thread(&Filosofo::iniciar, &filosofos[i]));
+        threads.emplace_back(cicloFilosofo, i, std::ref(filosofos[i]), std::ref(tenedores));
     }
 
-    for (int i = 0; i < num_filosofos; i++) {
-        threads[i].join();
+    // Esperar a que los hilos terminen
+    for (auto& thread : threads) {
+        thread.join();
     }
 
-    cout << "Estado del plato de fideos: " << fideos << endl;
+    // Imprimir estado final
+    std::cout << "Estado final del plato de fideos: " << fideos << std::endl;
+    std::cout << "Estómagos de los filósofos:" << std::endl;
     for (int i = 0; i < num_filosofos; i++) {
-        cout << "Filosofo " << i << ": Estomago: " << filosofos[i].obtenerEstomago() << endl;
+        std::cout << "Filósofo " << i << ": " << filosofos[i].estomago << std::endl;
     }
 
     return 0;
 }
-
