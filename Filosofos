@@ -1,25 +1,35 @@
 #include <iostream>
 #include <vector>
-#include <random>
 #include <thread>
 #include <mutex>
+#include <random>
+#include <chrono>
 
-std::mutex mtx; 
-unsigned fideos = 0;
+using namespace std;
+using namespace std::chrono;
+
+mutex mtx; 
+unsigned fideos = 100;
 class Filosofo {
 
 private:
 
     int id;
 
-    unsigned  estomago;
+    unsigned int estomago;
+    thread filosofoThread;
 
 public:
 
-    Filosofo(int id) : id(id), estomago(0) {}
+    Filosofo(int filosofid) : id(filosofid), estomago(0) {}
 
     void pensar() {
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution<int> distribution(1, 5);
 
+        int tiempoPensando = distribution(gen);
+        this_thread::sleep_for(seconds(tiempoPensando));
     }
 
     void comer(){
