@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <thread>
-#include <mutex>
+//#include <mutex>
 #include <random>
 #include <chrono>
 #include <condition_variable>//Sincronizacin que se puede utilizar para bloquear un subproceso
@@ -11,6 +11,7 @@ const int MAX_COMER = 500; // Tiempo mximo para comer (milisegundos)
 const int MAX_FIDEOS = 15; // Cantidad inicial de fideos en el plato
 
 std::mutex mtx; // Mutex para proteger acceso al plato de fideos
+std::mutex coutMutex; // mutex para proteger la salida en pantalla
 
 // estruct para representar a un filosofo
 struct Filosofo {
@@ -22,8 +23,11 @@ struct Filosofo {
         std::uniform_int_distribution<> dis(1, MAX_PENSAR);
         int tiempo = dis(gen);
         std::this_thread::sleep_for(std::chrono::milliseconds(tiempo));
-        std::cout << "Filosofo " <<id << " penso durante " << tiempo << " milisegundos." << std::endl;
-    }
+        {
+            std::lock_guard<std::mutex> lock(coutMutex);
+            std::cout << "Filosofo " << id << " penso durante " << tiempo << " milisegundos." << std::endl;
+        }
+}
 
     void comer() {
         std::random_device rd;
@@ -71,13 +75,16 @@ void cicloFilosofo(int id, Filosofo& filosofo, Tenedores& tenedores) {
         //std::cout << "Filosofo " << id << " esta pensando. Tiempo de pensamiento: " << MAX_PENSAR << " ms" << std::endl;
 
         tenedores.tomar(id);
-        if (fideos > 0) {
+        if (fideos > 1) {
             filosofo.comer();
             fideos--;
             
-            std::cout << "Filosofo " << id << " esta comiendo." << std::endl;
-            std::cout << "\tIncremento del estomago de filosofo " << id << ": " << filosofo.estomago << std::endl;
-            std::cout << "Cantidad de fideos en el estomago de filosofo " << id << ": " << filosofo.estomago << std::endl;
+           {
+                std::lock_guard<std::mutex> lock(coutMutex);
+                std::cout << "Filosofo " << id << " esta comiendo." << std::endl;
+                std::cout << "\tIncremento del estomago del filosofo " << id << ": " << filosofo.estomago << std::endl;
+                std::cout << "Cantidad de fideos en el plato: " << fideos << std::endl;
+            }
         }
         tenedores.dejar(id);
     }
@@ -106,9 +113,9 @@ int main() {
 
     // imprimir estado final
     std::cout << "Estado final del plato de fideos: " << fideos << std::endl;
-    std::cout << "Estomagos de los filosofos:" << std::endl;
+    std::cout << "Estomago de los filosofos:" << std::endl;
     for (int i = 0; i < num_filosofos; i++) {
-        std::cout << "Estomago Filosofo " << i << ": " << filosofos[i].estomago << std::endl;
+        std::cout << "Estomago Filosofo " << i+1 << ": " << filosofos[i].estomago << std::endl;
     }
 
     return 0;
